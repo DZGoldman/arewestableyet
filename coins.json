@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Tether",
+        "symbol": "USDT",
+        "balance": 3023432,
+        "type": "fiat proxy"
+    },
+    {
+        "name": "Gemini Dollar",
+        "symbol": "GUSD",
+        "balance": 1023432,
+        "type": "fiat proxy"
+    },
+    {
+        "name": "Dai",
+        "symbol": "Dai",
+        "balance": 23432,
+        "type": "crypto collatoralized"
+    },
+    {
+        "name": "USCOIN",
+        "symbol": "USD",
+        "balance": 6023432,
+        "type": "fiat proxy"
+    },
+]
