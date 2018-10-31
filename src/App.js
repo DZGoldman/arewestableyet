@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-
+import {commaSeparateNumber} from './helpers.js'
 class App extends Component {
   state = {
     coinData: [
@@ -37,18 +37,23 @@ class App extends Component {
     ],
     sort:{
       column: 'balance',
-      descending: true
+      descending: false
     },
     columnHeaders: ["name", "symbol", "balance", "type", "percent"]
   }
 
   componentDidMount = ()=>{
     this.setState({
-      coinData: this.addPercentsToCoins([...this.state.coinData])
+      coinData: this.addPercentsToCoins([...this.state.coinData]
+        .sort((a,b)=> a['balance'] > b['balance'])) 
+        .map((c)=>  Object.assign({}, c, {checked: true})).reverse() 
     })
   }
 
   sortBy = (header)=>{
+    if (header == this.state.sort.column){
+      return this.flipSortOrder()
+    }
     const coinData = [...this.state.coinData]
     const sort = Object.assign({}, this.state.sort, {column:header} )
     if (sort.descending){
@@ -68,6 +73,14 @@ class App extends Component {
       sort: Object.assign({}, sort, {descending:!sort.descending} ),
       coinData: coinData.reverse()
     })
+  }
+
+  toggleCheck = (coinIndex) => {
+    console.log(coinIndex)
+    const coinData = [...this.state.coinData]
+    coinData[coinIndex] = Object.assign({}, coinData[coinIndex], {checked: !coinData[coinIndex].checked })
+    this.setState({coinData})
+
   }
 
   addPercentsToCoins = (coinData) => {
@@ -91,28 +104,38 @@ class App extends Component {
             {columnHeaders.map((h)=>{
               return(
               <th 
-              key={h}
-              onClick={()=> this.sortBy(h)}
-              >
+                key={h}
+                onClick={()=> this.sortBy(h)}
+                style={
+                h != this.state.sort.column ? { fontWeight: "normal"} : {}
+                }>
               {h}
               </th>
             )
             })}
            
           </tr>
+          <br/>
         {
-          this.state.coinData.map((coin)=>{
-            return <tr key = {coin.symbol}>
-                   <td>{coin.name}</td>
-                   <td>{coin.symbol}</td>
-                   <td>$ {coin.balance}</td>
-                   <td>{coin.type}</td>
-                   <td>{(100*coin.percent).toFixed(2)} %</td>
-            </tr>
+          this.state.coinData.map((coin, index)=>{
+            return (
+              <tr key = {coin.symbol}>
+                <td>{coin.name}</td>
+                <td>{coin.symbol}</td>
+                <td>$ {commaSeparateNumber(coin.balance)}</td>
+                <td>{coin.type}</td>
+                <td>{(100*coin.percent).toFixed(2)} %</td>
+                <td> <input 
+                  type="checkbox"
+                  checked = {coin.checked}
+                  onClick = {()=> this.toggleCheck(index)}
+                  />
+                </td>
+              </tr>
+            )
           })
         }
          </tbody>
-         <button onClick = {this.flipSortOrder}>flip </button>
       </table>
       </div>
     );
@@ -120,3 +143,5 @@ class App extends Component {
 }
 
 export default App;
+
+
