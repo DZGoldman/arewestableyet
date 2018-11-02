@@ -21,7 +21,7 @@ def home():
 @app.route('/', methods=['Get'])
 
 def index():
-  '''Return index.html for all non-api routes'''
+    '''Return index.html for all non-api routes'''
 #   return render_template( 'index.html')
     return 'testing'
 
