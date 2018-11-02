@@ -1,5 +1,4 @@
 import requests, datetime, json, os
-
 from bs4 import BeautifulSoup
 
 def get_ether_soup(address):
@@ -52,4 +51,5 @@ def main():
         #TODO  sanity check
         coin['balance'] = float(balance)
     di['last_updated'] = str(datetime.datetime.now())
-    write_json_to_file(di)
+    # write_json_to_file(di)
+    return di
