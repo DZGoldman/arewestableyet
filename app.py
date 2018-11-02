@@ -22,8 +22,7 @@ def home():
 
 def index():
     '''Return index.html for all non-api routes'''
-#   return render_template( 'index.html')
-    return 'testing'
+    return render_template( 'index.html')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 33507))
