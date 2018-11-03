@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import "./App.css";
-import { commaSeparateNumber } from "./helpers.js";
 import FlipMove from "react-flip-move";
+import { commaSeparateNumber } from "./helpers.js";
 import { Table } from "react-bootstrap";
 import axios from "axios";
 
+// import Shuffle from 'react-shuffle'
 
 class App extends Component {
   constructor(props) {
@@ -15,8 +16,8 @@ class App extends Component {
         column: "balance",
         descending: false
       },
-      columnHeaders:    ["name", "symbol", "balance", "dominance", "type", "holders", "percents"],
-      columnHeaderNames: ["name", "symbol", "market cap", "dominance",  "stablecoin type", "holders", "% held by top account"]
+      columnHeaders:    ["name", "symbol", "balance", "dominance", '24_hour_volume', "vol_dominance", "type", "holders", "percents"],
+      columnHeaderNames: ["name", "symbol", "market cap", "cap dominance", "24-hr volume", "volume dominance",  "stability mechanism", "holders", "% held by top account"]
     };
 
   }
@@ -110,10 +111,12 @@ class App extends Component {
   };
 
   addPercentsToCoins = coinData => {
-    const total = coinData.map(c => c.balance).reduce((a, b) => a + b);
+    const totalBalance = coinData.map(c => c.balance).reduce((a, b) => a + b);
+    const totalVolume = coinData.map(c => c['24_hour_volume']).reduce((a, b) => a + b);
     // filter out unchecked
     coinData.forEach(coin => {
-      coin.dominance = coin.balance / total;
+      coin.dominance = coin.balance / totalBalance;
+      coin.vol_dominance = coin['24_hour_volume'] / totalVolume;
     });
     return coinData;
   };
@@ -135,6 +138,14 @@ class App extends Component {
       return "https://cryptofresh.com/a/USD"
     } else if (coin.symbol == "USDT") {
       return "https://omniexplorer.info/address/1NTMakcgVwQpMdGxRQnFKyb3G1FAJysSfz"
+    }
+  }
+
+  getVolPercent= (n) => {
+    if (n < .01){
+      return parseFloat( 100 * n).toFixed(4)
+    } else {
+      return parseFloat( 100 * n).toFixed(2)
     }
   }
   render() {
@@ -168,7 +179,7 @@ class App extends Component {
             </div>
           </div>
         </nav>
-        <Table className="table table-striped">
+        <table className="table table-striped">
           <thead>
             <tr   id='header-row'>
               {columnHeaders.map( (h, i) => {
@@ -189,7 +200,8 @@ class App extends Component {
             </tr>
           </thead>
           <tbody>
-            {coinData.length  == 0 && <div>loading...</div> }
+            {/* <FlipMove> */}
+            {coinData.length  == 0 && <tr>loading...</tr> }
             {coinData.length > 0 && coinData.map((coin, index) => {
               return (
                 <tr key={coin.symbol}>
@@ -197,6 +209,8 @@ class App extends Component {
                   <td>{coin.symbol}</td>
                   <td>$ <a target ='_blank' href={ this.getBalanceRef(coin)}> {commaSeparateNumber(coin.balance)} </a> </td>
                   <td>{(100 * coin.dominance).toFixed(2)} %</td>
+                  <td>{commaSeparateNumber(coin['24_hour_volume'])}</td>
+                  <td>{this.getVolPercent(coin.vol_dominance)} %</td>
                   <td>{coin.type}</td>
                   <td>{coin.holders}</td>
                   <td> <a target ='_blank' href={ this.getPercentRef(coin)}> {coin.percents} % </a></td>
@@ -212,7 +226,7 @@ class App extends Component {
             })}
             {/* </FlipMove> */}
           </tbody>
-        </Table>
+        </table>
         {coinData.length > 0 && <div id="data-container">
           <div>Total ${commaSeparateNumber(total)}</div>
           <div>Last Updated: {this.state.lastUpdated}</div>

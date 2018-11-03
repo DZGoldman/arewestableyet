@@ -2,7 +2,7 @@ from flask import Flask, render_template
 from flask_cors import CORS
 
 import os, json, time
-from coin_data import main
+from coin_data import main, read_json_file
 from threading import Thread
 
 app = Flask(__name__, static_folder="./build/static", template_folder="./build")
@@ -12,7 +12,7 @@ CORS(app)
  
 
 
-data = main()
+data = main() if not os.environ.get('DEV') else read_json_file() 
 
 @app.route('/data', methods=['Get'])
 def home():

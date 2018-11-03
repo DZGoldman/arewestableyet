@@ -67,15 +67,29 @@ def write_json_to_file(d):
     with open('coins.json', 'w') as fp:
         json.dump(d, fp)
 
+def volume_data_as_dict():
+    data = requests.get("https://api.coinmarketcap.com/v1/ticker/?limit=10000").json()
+    d = {}
+    for coin in data:
+        symbol = coin.get('symbol')
+        volume = coin.get('24h_volume_usd')
+        if symbol and volume:
+            d[symbol] = int(float(volume))
+    return d
+
 def main():
     di = read_json_file()
     coins = di['coins']
+    volume_dict = volume_data_as_dict()
     for coin in coins:
-        if coin.get('symbol') == "BITUSD":
+        symbol = coin.get('symbol')
+        coin['24_hour_volume'] = volume_dict.get(symbol)
+
+        if symbol== "BITUSD":
             coin['holders'], balance, coin['percents'] = get_bit_usd_data()
 
 
-        elif coin.get('symbol') == "DGX":
+        elif symbol == "DGX":
             address = coin.get('address')
             soup = get_ether_soup(address)
             balance = scape_value_ether(soup)
@@ -93,7 +107,7 @@ def main():
             coin['holders'] = holders
             coin['percents'] = get_ether_percents(address)
 
-        elif coin.get('symbol') == "USDT":
+        elif symbol== "USDT":
             whale_balance = get_btf_usdt_balance()
             balance = get_usdt_balance() 
             coin['percents'] = round( 100 * whale_balance / balance , 2)
