@@ -157,7 +157,7 @@ class App extends Component {
       coinData.length && coinData.map(c => c.balance).reduce((a, b) => a + b);
     return (
       <div className="App">
-          <Favicon url="https://www.freeiconspng.com/img/10047" />
+          <Favicon url="https://cdn.onlinewebfonts.com/svg/img_426072.png" />
 
         <nav id="navbar" className="navbar navbar-dark">
           <div id="nav-items-container">
@@ -210,9 +210,9 @@ class App extends Component {
                 <tr key={coin.symbol}>
                   <td><a target ='_blank' href={ coin.homepage}>{coin.name}</a></td>
                   <td>{coin.symbol}</td>
-                  <td>$ <a target ='_blank' href={ this.getBalanceRef(coin)}> {commaSeparateNumber(coin.balance)} </a> </td>
+                  <td className='right-al'> $ <a target ='_blank' href={ this.getBalanceRef(coin)}> {commaSeparateNumber(coin.balance)} </a> </td>
                   <td>{(100 * coin.dominance).toFixed(2)} %</td>
-                  <td>$ {commaSeparateNumber(coin['24_hour_volume'])}</td>
+                  <td className='right-al'>$ {commaSeparateNumber(coin['24_hour_volume'])}</td>
                   <td>{this.getVolPercent(coin.vol_dominance)} %</td>
                   <td>{coin.type}</td>
                   <td><a target ='_blank' href={coin.auditor_url}>{coin.auditor} </a> </td>

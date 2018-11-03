@@ -10,7 +10,14 @@
 
 body{
   background-color: rgba(254, 254, 254, 0.619);
-  font-family: "Courier New black", Courier, monospace
+  font-family: "Courier New black", Courier, monospace;
+  font-size: 14px;
+}
+
+td.right-al{
+  max-width:100%;
+  white-space:nowrap;
+  text-align: right;
 }
 #nav-items-container{
  display: flex;
@@ -81,7 +88,7 @@ thead{
 
 .footer-bottom{
   margin-top: 50px;
-  font-size: 12px;
+  font-size: 11px;
 }
 #inspired-by{
   margin-top: 8px;
