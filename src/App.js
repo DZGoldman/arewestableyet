@@ -45,7 +45,7 @@ class App extends Component {
         window.setInterval( ()=>{
           this.wobble()
 
-        }, 1000*45)
+        }, 1000*20)
 
       }, 2000)
     });
