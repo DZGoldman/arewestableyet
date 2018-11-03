@@ -4,6 +4,7 @@ import FlipMove from "react-flip-move";
 import { commaSeparateNumber } from "./helpers.js";
 import { Table } from "react-bootstrap";
 import axios from "axios";
+import Favicon from 'react-favicon';
 
 // import Shuffle from 'react-shuffle'
 
@@ -16,8 +17,8 @@ class App extends Component {
         column: "balance",
         descending: false
       },
-      columnHeaders:    ["name", "symbol", "balance", "dominance", '24_hour_volume', "vol_dominance", "type", "holders", "percents"],
-      columnHeaderNames: ["name", "symbol", "market cap", "cap dominance", "24-hr volume", "volume dominance",  "stability mechanism", "holders", "% held by top account"]
+      columnHeaders:    ["name", "symbol", "balance", "dominance", '24_hour_volume', "vol_dominance", "type", "auditor", "holders", "percents"],
+      columnHeaderNames: ["name", "symbol", "market cap", "cap dominance", "24-hr volume", "volume dominance",  "stability mechanism", "auditor", "holders", "% held by top account"]
     };
 
   }
@@ -156,6 +157,8 @@ class App extends Component {
       coinData.length && coinData.map(c => c.balance).reduce((a, b) => a + b);
     return (
       <div className="App">
+          <Favicon url="https://www.freeiconspng.com/img/10047" />
+
         <nav id="navbar" className="navbar navbar-dark">
           <div id="nav-items-container">
             <div  className="navbar-brand"  onClick={this.wobble}>
@@ -179,7 +182,7 @@ class App extends Component {
             </div>
           </div>
         </nav>
-        <table className="table table-striped">
+        <Table className="table table-striped">
           <thead>
             <tr   id='header-row'>
               {columnHeaders.map( (h, i) => {
@@ -209,9 +212,10 @@ class App extends Component {
                   <td>{coin.symbol}</td>
                   <td>$ <a target ='_blank' href={ this.getBalanceRef(coin)}> {commaSeparateNumber(coin.balance)} </a> </td>
                   <td>{(100 * coin.dominance).toFixed(2)} %</td>
-                  <td>{commaSeparateNumber(coin['24_hour_volume'])}</td>
+                  <td>$ {commaSeparateNumber(coin['24_hour_volume'])}</td>
                   <td>{this.getVolPercent(coin.vol_dominance)} %</td>
                   <td>{coin.type}</td>
+                  <td><a target ='_blank' href={coin.auditor_url}>{coin.auditor} </a> </td>
                   <td>{coin.holders}</td>
                   <td> <a target ='_blank' href={ this.getPercentRef(coin)}> {coin.percents} % </a></td>
                   
@@ -226,7 +230,7 @@ class App extends Component {
             })}
             {/* </FlipMove> */}
           </tbody>
-        </table>
+        </Table>
         {coinData.length > 0 && <div id="data-container">
           <div>Total ${commaSeparateNumber(total)}</div>
           <div>Last Updated: {this.state.lastUpdated}</div>
