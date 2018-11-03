@@ -5,15 +5,22 @@ import FlipMove from "react-flip-move";
 import { Table } from "react-bootstrap";
 import axios from "axios";
 
+
 class App extends Component {
-  state = {
-    coinData: [],
-    sort: {
-      column: "balance",
-      descending: false
-    },
-    columnHeaders: ["name", "symbol", "balance", "type", "dominance", "holders", "% held by top account"]
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      coinData: [],
+      sort: {
+        column: "balance",
+        descending: false
+      },
+      columnHeaders:    ["name", "symbol", "balance", "dominance", "type", "holders", "percents"],
+      columnHeaderNames: ["name", "symbol", "market cap", "dominance",  "stablecoin type", "holders", "% held by top account"]
+    };
+
+  }
+
 
   componentDidMount = () => {
     this.dataUrl = "/data";
@@ -21,18 +28,50 @@ class App extends Component {
       this.dataUrl = "http://0.0.0.0:33507" + this.dataUrl;
     }
 
+
     axios.get(this.dataUrl).then(d => {
-      console.log(d);
       this.setState({
         coinData: this.addPercentsToCoins(
-          d.data.coins.sort((a, b) => a["balance"] - b["balance"])
+          d.data.coins.sort((a, b) => a["balance"] >= b["balance"] ? 1 : -1)
         )
           .map(c => Object.assign({}, c, { checked: true }))
           .reverse(),
         lastUpdated: d.data.last_updated
       });
+
+      window.setTimeout(()=>{
+        this.wobble()
+
+        window.setInterval( ()=>{
+          this.wobble()
+
+        }, 1000*45)
+
+      }, 2000)
     });
+
+
   };
+
+  wobble = () => {
+    var currentClass = 'rotate'
+    var i = 0;
+    var id = window.setInterval(()=>{
+      i++
+      currentClass = currentClass == 'rotate' ? 'back-rotate' : "rotate"
+      this.setState({
+        rotateClass: currentClass
+      }, ()=>{
+        if (i > 20){
+          window.clearInterval(id)
+          this.setState({
+            rotateClass: ''
+          })
+        }
+      })
+    }, 130)
+ 
+  }
 
   sortBy = header => {
     console.log(header)
@@ -42,10 +81,10 @@ class App extends Component {
     const coinData = [...this.state.coinData];
     const sort = Object.assign({}, this.state.sort, { column: header });
     if (sort.descending) {
-      coinData.sort((a, b) => a[header] - b[header]);
+      coinData.sort((a, b) => a[header] >= b[header] ? 1 : -1);
 
     } else {
-      coinData.sort((a, b) => b[header] - a[header]);
+      coinData.sort((a, b) => b[header] >= a[header] ? 1 : -1);
     }
     this.setState({
       coinData,
@@ -78,7 +117,29 @@ class App extends Component {
     });
     return coinData;
   };
+
+  getBalanceRef = coin =>{
+    if (coin.chain == "ether"){
+      return "https://etherscan.io/token/" + coin.address
+    } else if (coin.symbol == "USDT"){
+      return coin.data_url
+    } else if (coin.symbol == "BITUSD"){
+      return coin.data_url
+    }
+  }
+
+  getPercentRef = coin => {
+    if (coin.chain == 'ether') {
+      return "https://etherscan.io/token/tokenholderchart/" + coin.address
+    } else if (coin.symbol == "BITUSD"){
+      return "https://cryptofresh.com/a/USD"
+    } else if (coin.symbol == "USDT") {
+      return "https://omniexplorer.info/address/1NTMakcgVwQpMdGxRQnFKyb3G1FAJysSfz"
+    }
+  }
   render() {
+
+
     const { coinData, columnHeaders } = this.state;
     const total =
       coinData.length && coinData.map(c => c.balance).reduce((a, b) => a + b);
@@ -86,30 +147,31 @@ class App extends Component {
       <div className="App">
         <nav id="navbar" className="navbar navbar-dark">
           <div id="nav-items-container">
-            <div>
-              <a className="navbar-brand" href="/">
-                are we <span id='stable'>stable</span> yet?
-              </a>
+            <div  className="navbar-brand"  onClick={this.wobble}>
+              <i className="fas fa-balance-scale"></i>  are we <span className={this.state.rotateClass} id='stable'>stable</span> yet?
             </div>
-            <div className='go-right'>
-              <a className="navbar-brand" href={this.dataUrl}>
-                <i className="fas fa-fw fa-code" /> JSON API
-              </a>
-            </div>
-            <div className='go-right'>
-              <a
-                className="navbar-brand"
-                href="https://github.com/ummjackson/awdy"
-              >
-                <i className="fab fa-fw fa-github" /> Contribute on Github
-              </a>
+            <div id='header-right-wrapper'>
+              <div>
+                <a className="navbar-brand" 
+                href={this.dataUrl}>
+                  <i className="fas fa-fw fa-code" /> JSON API
+                </a>
+              </div>
+              <div>
+                <a
+                  className="navbar-brand"
+                  href="https://github.com/DZGoldman/arewestableyet"
+                >
+                  <i className="fab fa-fw fa-github" /> Contribute on Github
+                </a>
+              </div>
             </div>
           </div>
         </nav>
         <Table className="table table-striped">
           <thead>
-            <tr>
-              {columnHeaders.map(h => {
+            <tr   id='header-row'>
+              {columnHeaders.map( (h, i) => {
                 return (
                   <th
                     key={h}
@@ -120,24 +182,24 @@ class App extends Component {
                         : "emphasized-col"
                     }
                   >
-                    {h}
+                    {this.state.columnHeaderNames[i]}
                   </th>
                 );
               })}
             </tr>
           </thead>
           <tbody>
-            {/* <FlipMove > */}
-            {this.state.coinData.map((coin, index) => {
+            {coinData.length  == 0 && <div>loading...</div> }
+            {coinData.length > 0 && coinData.map((coin, index) => {
               return (
                 <tr key={coin.symbol}>
-                  <td>{coin.name}</td>
+                  <td><a target ='_blank' href={ coin.homepage}>{coin.name}</a></td>
                   <td>{coin.symbol}</td>
-                  <td>$ {commaSeparateNumber(coin.balance)}</td>
-                  <td>{coin.type}</td>
+                  <td>$ <a target ='_blank' href={ this.getBalanceRef(coin)}> {commaSeparateNumber(coin.balance)} </a> </td>
                   <td>{(100 * coin.dominance).toFixed(2)} %</td>
-                  <td>{coin.holders} </td>
-                  <td>{coin.whale_balance} </td>
+                  <td>{coin.type}</td>
+                  <td>{coin.holders}</td>
+                  <td> <a target ='_blank' href={ this.getPercentRef(coin)}> {coin.percents} % </a></td>
                   
                     {/* <td><input 
                   type="checkbox"
@@ -151,10 +213,11 @@ class App extends Component {
             {/* </FlipMove> */}
           </tbody>
         </Table>
-        <div id="data-container">
+        {coinData.length > 0 && <div id="data-container">
           <div>Total ${commaSeparateNumber(total)}</div>
           <div>Last Updated: {this.state.lastUpdated}</div>
-        </div>
+          </div> 
+        }
 
         <footer>
     <div className="footer" id="footer">
@@ -162,12 +225,14 @@ class App extends Component {
     
     <div className="footer-bottom">
       <div className='footer-row'>
-          <div> <p> Created by Daniel Goldman </p> </div>
+          <div>Created by Daniel Goldman </div>
           <div> <a target ="_blank" href="https://twitter.com/DZack23"> <i className="fab fa-twitter"> </i> </a> </div>
           <div> <a target ="_blank" href="https://github.com/DZGoldman"> <i className="fab fa-github"></i> </a> </div>
           <div> <a target ="_blank" href="https://medium.com/@dzack23"> <i className="fab fa-medium"></i> </a> </div>
           <div> <a target ="_blank" href="http://danielzgoldman.com/"> <i className="fa fa-home"></i> </a> </div>
       </div>
+      <div id='inspired-by'  className='footer-row'> blatantly inspired by &nbsp;<a target='_blank' href='https://arewedecentralizedyet.com/'>arewedecentralizedyet.com</a></div>
+
         <div  id='tips' className='footer-row'>
           <div > <p> Stability ain't cheap, send a tip: </p> </div> 
             <div className='tip'>BTC: <b>33STRJgjFgG2r8vEy9xLKN5dYfw26tSmVi</b></div>

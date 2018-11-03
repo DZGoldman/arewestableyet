@@ -1,13 +1,28 @@
 /* .App {
  background-color: grey
 } */
+:root {
+  --transform-time:120ms;
+  --degrees: 15deg;
+  --neg-degrees: -15deg;
+  
+}
+
 body{
   background-color: rgba(254, 254, 254, 0.619);
-  font-family: Arial, Helvetica, sans-serif
+  font-family: "Courier New black", Courier, monospace
 }
 #nav-items-container{
  display: flex;
  flex-direction: row;
+ justify-content: space-between;
+ padding-left: 15px;
+ padding-right: 15px;
+}
+
+#header-right-wrapper{
+  display: flex;
+  flex-direction: row;
 }
 
 thead{
@@ -21,16 +36,19 @@ thead{
 
 }
 
-#nav-items-container > div > a{
-  text-decoration: none; color: rgb(230, 229, 229);
-}
+ .navbar-brand, .navbar-brand:hover{
+  text-decoration: none; 
+  color: rgb(230, 229, 229);
+  cursor: pointer;
+
+  }
 
 .deemphasized-col{
   font-weight: normal
 }
 
 .emphasized-col{
-  color: blue;
+  color: rgb(22, 154, 255);
 }
 
 #data-container{
@@ -62,15 +80,27 @@ thead{
 }
 
 .footer-bottom{
-  margin-top: 70px;
-  font-size: 15px;
+  margin-top: 50px;
+  font-size: 12px;
 }
-
+#inspired-by{
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
 .go-right{
   /* margin-left: 100px; */
 }
 
+#header-row{
+height: 60px;
+}
+#header-row > th {
+  font-size: 17px;
+} 
 
+table{
+  /* font-size: 15px; */
+}
 
 /* .App-header {
   background-color: #282c34;
@@ -86,4 +116,36 @@ thead{
 /* .App-link {
   color: #61dafb;
 } */
+.rotate{
+  display: inline-block;
+  /* color: red;
+  font-weight: bold; */
+  -webkit-transition: transform var(--transform-time);
+  -moz-transition:transform  var(--transform-time);
+  -ms-transition: transform  var(--transform-time);
+  -o-transition: transform  var(--transform-time);
+  transition: transform  var(--transform-time);
+
+  -webkit-transform: var(--transform-time);;
+    -moz-transform: rotate(var(--degrees));
+     -ms-transform: rotate(var(--degrees));
+      -o-transform: rotate(var(--degrees));
+         transform: rotate(var(--degrees));
+}
+
+.back-rotate{
+  display: inline-block;
+  -webkit-transition: transform  var(--transform-time);
+  -moz-transition:transform  var(--transform-time);
+  -ms-transition: transform  var(--transform-time);
+  -o-transition: transform  var(--transform-time);
+  transition: transform  var(--transform-time);
+
+  -webkit-transform: rotate(var(--neg-degrees));
+    -moz-transform: rotate(var(--neg-degrees));
+     -ms-transform: rotate(var(--neg-degrees));
+      -o-transform: rotate(var(--neg-degrees));
+         transform: rotate(var(--neg-degrees));
+
+}
 
