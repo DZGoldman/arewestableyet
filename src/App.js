@@ -18,7 +18,7 @@ class App extends Component {
         descending: false
       },
       columnHeaders:    ["name", "symbol", "balance", "dominance", '24_hour_volume', "vol_dominance", "type", "auditor", "holders", "percents"],
-      columnHeaderNames: ["name", "symbol", "market cap", "cap dominance", "24-hr volume", "volume dominance",  "stability mechanism", "auditor", "holders", "% held by top account"]
+      columnHeaderNames: ["name", "symbol", "market cap", "cap dominance*", "24-hr volume", "volume dominance*",  "stability mechanism", "auditor", "holders", "% held by top account"]
     };
 
   }
@@ -155,7 +155,8 @@ class App extends Component {
     const { coinData, columnHeaders } = this.state;
     const total =
       coinData.length && coinData.map(c => c.balance).reduce((a, b) => a + b);
-    return (
+      
+      return (
       <div className="App">
           <Favicon url="https://cdn.onlinewebfonts.com/svg/img_426072.png" />
 
@@ -186,17 +187,21 @@ class App extends Component {
           <thead>
             <tr   id='header-row'>
               {columnHeaders.map( (h, i) => {
+                const isCurrentColumn =     h == this.state.sort.column;
                 return (
                   <th
                     key={h}
                     onClick={() => this.sortBy(h)}
                     className={
-                      h != this.state.sort.column
-                        ? "deemphasized-col"
-                        : "emphasized-col"
+                      isCurrentColumn
+                        ? "emphasized-col"
+                        : "deemphasized-col"
                     }
                   >
+                    <span>
                     {this.state.columnHeaderNames[i]}
+                    {isCurrentColumn && (!this.state.sort.descending ? <span className='arrow'>&#x2191;</span> :  <span className='arrow'>&#x2193;</span>)}</span>
+             
                   </th>
                 );
               })}
@@ -232,8 +237,10 @@ class App extends Component {
           </tbody>
         </Table>
         {coinData.length > 0 && <div id="data-container">
-          <div>Total ${commaSeparateNumber(total)}</div>
-          <div>Last Updated: {this.state.lastUpdated}</div>
+          <div>total market cap: ${commaSeparateNumber(total)}</div>
+          <div>last updated: {this.state.lastUpdated}</div>
+            <br/>
+          <div>* market cap dominance & volume dominance are both relative to the coins in this chart</div>
           </div> 
         }
 
