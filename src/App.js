@@ -17,9 +17,11 @@ class App extends Component {
         column: "balance",
         descending: false
       },
+      tetherBalance: 'total_balance',
       columnHeaders:    ["name", "symbol", "balance", "dominance", '24_hour_volume', "vol_dominance", "type", "auditor", "holders", "percents"],
       columnHeaderNames: ["name", "symbol", "market cap", "cap dominance*", "24-hr volume", "volume dominance*",  "stability mechanism", "auditor", "holders", "% held by top account"]
     };
+    window.r = this
 
   }
 
@@ -149,6 +151,25 @@ class App extends Component {
       return parseFloat( 100 * n).toFixed(2)
     }
   }
+
+  setTetherBalance = (e ) =>{
+    
+    const newField = e.target.value
+    const coinData = [...this.state.coinData]
+    this.state.coinData.forEach((coin, index)=>{
+      if(coin.symbol == 'USDT'){
+        const newCoin = {...coin};
+        newCoin.balance = newCoin[newField]
+        coinData[index] = newCoin
+      }
+    })
+
+    const newCoinsWithPercents = this.addPercentsToCoins(coinData);
+    this.setState({
+      coinData: newCoinsWithPercents,
+      tetherBalance: newField
+    })
+  }
   render() {
 
 
@@ -236,6 +257,12 @@ class App extends Component {
             {/* </FlipMove> */}
           </tbody>
         </Table>
+
+        <div id='radio-container' onChange={this.setTetherBalance.bind(this)}>
+         <div>for usdt market cap...</div>
+          <div><input defaultChecked type="radio" value="total_balance" name="gender"/> include all on-chain reserves (as described in <a target="_blank" href="https://tether.to/wp-content/uploads/2016/06/TetherWhitePaper.pdf">whitepaper</a>)</div>
+         <div> <input type="radio" value="alt_balance" name="gender"/> disclude tether treasury (as reported by <a target="_blank" href="https://coinmarketcap.com/currencies/tether/">coinmarketcap</a>)</div>
+      </div>
         {coinData.length > 0 && <div id="data-container">
           <div>total market cap: ${commaSeparateNumber(total)}</div>
           <div>last updated: {this.state.lastUpdated}</div>
@@ -243,6 +270,7 @@ class App extends Component {
           <div>* market cap dominance & volume dominance are both relative to the coins in this chart</div>
           </div> 
         }
+
 
         <footer>
     <div className="footer" id="footer">

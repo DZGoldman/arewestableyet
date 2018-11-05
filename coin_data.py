@@ -39,6 +39,9 @@ def get_usdt_balance():
     res = requests.get('http://omniexplorer.info/ask.aspx?api=getpropertytotaltokens&prop=31').json()
     if(isinstance(res, float) ):
         return res
+def get_usdt_alt_balance():
+    res = requests.get('https://api.coinmarketcap.com/v1/ticker/tether/').json()
+    return int(float(res[0]['market_cap_usd']))
 def get_btf_usdt_balance():
     data =requests.post(
         url="https://api.omniexplorer.info/v1/address/addr/details/", 
@@ -110,8 +113,10 @@ def main():
         elif symbol== "USDT":
             whale_balance = get_btf_usdt_balance()
             balance = get_usdt_balance() 
+            alt_balance = get_usdt_alt_balance()
             coin['percents'] = round( 100 * whale_balance / balance , 2)
-
+            coin['total_balance'] = balance
+            coin['alt_balance'] = alt_balance
 
         #TODO  sanity check
         coin['balance'] = float(balance)
