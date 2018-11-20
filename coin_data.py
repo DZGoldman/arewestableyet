@@ -82,48 +82,52 @@ def volume_data_as_dict():
 
 def main():
     di = read_json_file()
-    coins = di['coins']
-    volume_dict = volume_data_as_dict()
-    for coin in coins:
-        symbol = coin.get('symbol')
-        coin['24_hour_volume'] = volume_dict.get(symbol)
+    try:
+        coins = di['coins']
+        volume_dict = volume_data_as_dict()
+        for coin in coins:
+            symbol = coin.get('symbol')
+            coin['24_hour_volume'] = volume_dict.get(symbol)
 
-        if symbol== "BITUSD":
-            try:
-                coin['holders'], balance, coin['percents'] = get_bit_usd_data()
-            except:
-                print('bitusd error')
+            if symbol== "BITUSD":
+                try:
+                    coin['holders'], balance, coin['percents'] = get_bit_usd_data()
+                except:
+                    print('bitusd error')
 
-        elif symbol == "DGX":
-            address = coin.get('address')
-            soup = get_ether_soup(address)
-            balance = scape_value_ether(soup)
-            holders = get_holders_count(soup)
-            coin['holders'] = holders
-            coin['percents'] = get_ether_percents(address)
+            elif symbol == "DGX":
+                address = coin.get('address')
+                soup = get_ether_soup(address)
+                balance = scape_value_ether(soup)
+                holders = get_holders_count(soup)
+                coin['holders'] = holders
+                coin['percents'] = get_ether_percents(address)
 
-        elif coin.get('chain') == 'ether':
-            address = coin.get('address')
-            balance = get_balance_ether(address)
-            balance = balance[0: len(balance) - coin['decimals']]
+            elif coin.get('chain') == 'ether':
+                address = coin.get('address')
+                balance = get_balance_ether(address)
+                balance = balance[0: len(balance) - coin['decimals']]
 
-            soup = get_ether_soup(address)
-            holders = get_holders_count(soup)
-            coin['holders'] = holders
-            coin['percents'] = get_ether_percents(address)
+                soup = get_ether_soup(address)
+                holders = get_holders_count(soup)
+                coin['holders'] = holders
+                coin['percents'] = get_ether_percents(address)
 
-        elif symbol== "USDT":
-            whale_balance = get_btf_usdt_balance()
-            balance = get_usdt_balance() 
-            alt_balance = get_usdt_alt_balance()
-            coin['percents'] = round( 100 * whale_balance / balance , 2)
-            coin['total_balance'] = balance
-            coin['alt_balance'] = alt_balance
+            elif symbol== "USDT":
+                whale_balance = get_btf_usdt_balance()
+                balance = get_usdt_balance() 
+                alt_balance = get_usdt_alt_balance()
+                coin['percents'] = round( 100 * whale_balance / balance , 2)
+                coin['total_balance'] = balance
+                coin['alt_balance'] = alt_balance
 
-        #TODO  sanity check
-        coin['balance'] = float(balance)
-        print(coin)
-    di['last_updated'] = strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ' ' + strftime("%Z", gmtime())
+            #TODO  sanity check
+            coin['balance'] = float(balance)
+            print(coin)
+        di['last_updated'] = strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ' ' + strftime("%Z", gmtime())
+    except Exception as e: 
+        print('SOMETHING WENT WRONG')
+        print(e)
     if os.environ.get('DEV'):
         write_json_to_file(di)
     return di
