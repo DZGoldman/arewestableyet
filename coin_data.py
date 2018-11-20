@@ -89,8 +89,10 @@ def main():
         coin['24_hour_volume'] = volume_dict.get(symbol)
 
         if symbol== "BITUSD":
-            coin['holders'], balance, coin['percents'] = get_bit_usd_data()
-
+            try:
+                coin['holders'], balance, coin['percents'] = get_bit_usd_data()
+            except:
+                print('bitusd error')
 
         elif symbol == "DGX":
             address = coin.get('address')
