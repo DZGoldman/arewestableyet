@@ -82,10 +82,11 @@ def volume_data_as_dict():
 
 def main():
     di = read_json_file()
-    try:
-        coins = di['coins']
-        volume_dict = volume_data_as_dict()
-        for coin in coins:
+    coins = di['coins']
+    volume_dict = volume_data_as_dict()
+    for coin in coins:
+        try:
+            print('trying', coin)
             symbol = coin.get('symbol')
             coin['24_hour_volume'] = volume_dict.get(symbol)
 
@@ -96,6 +97,7 @@ def main():
                     print('bitusd error')
 
             elif symbol == "DGX":
+                embed()
                 address = coin.get('address')
                 soup = get_ether_soup(address)
                 balance = scape_value_ether(soup)
@@ -124,10 +126,10 @@ def main():
             #TODO  sanity check
             coin['balance'] = float(balance)
             print(coin)
-        di['last_updated'] = strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ' ' + strftime("%Z", gmtime())
-    except Exception as e: 
-        print('SOMETHING WENT WRONG')
-        print(e)
+        except Exception as e: 
+            print('SOMETHING WENT WRONG')
+            print(e)
+    di['last_updated'] = strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ' ' + strftime("%Z", gmtime())
     if os.environ.get('DEV'):
         write_json_to_file(di)
     return di
