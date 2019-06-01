@@ -97,7 +97,6 @@ def main():
                     print('bitusd error')
 
             elif symbol == "DGX":
-                embed()
                 address = coin.get('address')
                 soup = get_ether_soup(address)
                 balance = scape_value_ether(soup)
